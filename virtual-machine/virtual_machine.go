@@ -2,6 +2,7 @@ package virtualmachine
 
 import (
 	"bytes"
+	"fmt"
 	"iguanazilla/logkit"
 	"os"
 )
@@ -91,11 +92,12 @@ func (vm *VirtualMachine) load_memory() {
 
 		var tokens []string
 		var token []byte
-		var is_in_quotes bool = false
+		var is_in_quotes bool = false // se está dentro de aspas
 
 		for i := 0; i < len(line); i++ {
 			//checa se no final da linha tem aspas, se não tiver, dá erro
-			if i == len(line)-1 && is_in_quotes && line[i] != '"' || i == len(line)-1 && is_in_quotes && line[i] == '"' {
+			if i == len(line)-1 && is_in_quotes && line[i] != '"' || i == len(line)-1 && !is_in_quotes && line[i] == '"' {
+				fmt.Println(string(line[i]), is_in_quotes, i, len(line))
 				lk.LineError(uint16(i_line+1), "Missing closing quotes")
 				os.Exit(1)
 			}
