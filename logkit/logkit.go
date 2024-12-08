@@ -1,6 +1,9 @@
 package logkit
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 const (
 	red    = "\033[1;31m"
@@ -20,23 +23,31 @@ func NewLogkit(prefix string) *Logkit {
 	return &Logkit{prefix: prefix}
 }
 
-func (l *Logkit) Info(msg string) {
-	all := []any{
+func (l *Logkit) Info(msg ...string) {
+	fmt.Printf(
+		"%s%s %s%s %s%s\n",
 		green, "[INFO]",
-		reset, msg,
-	}
-	fmt.Printf("%s%s %s%s\n", all...)
+		prefix_color, l.prefix,
+		reset, strings.Join(msg, " "),
+	)
 }
 
-func (l *Logkit) Error(msg string) {
-	all := []any{
+func (l *Logkit) Error(msg ...string) {
+	fmt.Printf(
+		"%s%s %s%s %s%s\n",
 		red, "[ERROR]",
 		prefix_color, l.prefix,
-		reset, msg,
-	}
-	fmt.Printf("%s%s %s%s: %s%s\n", all...)
+		reset, strings.Join(msg, " "),
+	)
 }
 
-func (l *Logkit) LineError(line uint16, msg string) {
-	l.Error(fmt.Sprintf("Line %d: %s", line, msg))
+func (l *Logkit) LineError(line uint16, msg ...string) {
+	aux := append(
+		[]string{
+			"Line:", fmt.Sprint(line),
+			string(line),
+		},
+		msg...,
+	)
+	l.Error(aux...)
 }
