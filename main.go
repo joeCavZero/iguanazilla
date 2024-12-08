@@ -10,9 +10,9 @@ import (
 func main() {
 	argc := len(os.Args)
 
-	lk := logkit.NewLogkit("args-parsing")
+	lk := logkit.NewLogkit("virtual-machine")
 	if argc == 2 {
-		lk.Info("Iniciando Iguanazilla")
+		lk.Info("initializing iguanazilla virtual machine")
 
 		iguanazilla := virtualmachine.NewVirtualMachine(os.Args[1])
 		iguanazilla.Run()

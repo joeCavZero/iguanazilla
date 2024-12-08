@@ -32,16 +32,16 @@ func (l *Logkit) Info(msg ...string) {
 	)
 }
 
-func (l *Logkit) Error(msg ...string) {
+func (lk *Logkit) Error(msg ...string) {
 	fmt.Printf(
 		"%s%s %s%s %s%s\n",
 		red, "[ERROR]",
-		prefix_color, l.prefix,
+		prefix_color, lk.prefix,
 		reset, strings.Join(msg, " "),
 	)
 }
 
-func (l *Logkit) LineError(line uint16, msg ...string) {
+func (lk *Logkit) LineError(line uint16, msg ...string) {
 	aux := append(
 		[]string{
 			"Line:", fmt.Sprint(line),
@@ -49,5 +49,16 @@ func (l *Logkit) LineError(line uint16, msg ...string) {
 		},
 		msg...,
 	)
-	l.Error(aux...)
+	lk.Error(aux...)
+}
+
+func (lk *Logkit) LineInfo(line uint16, msg ...string) {
+	aux := append(
+		[]string{
+			"Line:", fmt.Sprint(line),
+			string(line),
+		},
+		msg...,
+	)
+	lk.Info(aux...)
 }
