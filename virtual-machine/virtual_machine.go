@@ -42,15 +42,8 @@ func (vm *VirtualMachine) load_memory() {
 		panic(err)
 	}
 
-	/*
-		======== PROCESS THE CONTENT OF THE FILE (REMOVE COMMENTS, MULTI SPACES, TABS, ETC)
-	*/
-	// remove \t
 	raw_data = bytes.ReplaceAll(raw_data, []byte("\t"), []byte(" ")) // REMOVE OS TABS
 	raw_data = bytes.ReplaceAll(raw_data, []byte("\r"), []byte(" ")) // REMOVE OS CARRIAGE RETURN
-	//raw_data = bytes.ReplaceAll(raw_data, []byte("\n"), []byte(" ")) // REMOVE OS NEW LINE
-
-	//fmt.Println("-->", string(raw_data))
 
 	/*
 		ANOTAÇÕES:
@@ -94,6 +87,14 @@ func terraform_line(line []byte) []byte {
 			break
 		} else if char == '"' { // se for aspas, inverte o estado de is_quote_opened
 			is_quote_opened = !is_quote_opened
+
+			// se recentemente abriu aspas, adicionamos um espaço antes
+			// isso é para evitar que as aspas fiquem grudadas com a palavra (word)
+			if is_quote_opened && len(processed_line) > 0 && processed_line[len(processed_line)-1] != ' ' {
+				processed_line = append(processed_line, ' ')
+			}
+
+			// enfim, adicionamos a aspas
 			processed_line = append(processed_line, char)
 		} else if char == ' ' {
 			if is_quote_opened {
@@ -112,6 +113,7 @@ func terraform_line(line []byte) []byte {
 		} else if char == ',' {
 			if is_quote_opened {
 				processed_line = append(processed_line, char)
+
 			} else {
 				var last_char byte = 0
 				var next_char byte = 0
@@ -121,17 +123,17 @@ func terraform_line(line []byte) []byte {
 				if i_char < len(line)-1 {
 					next_char = line[i_char+1]
 				}
-
-				if last_char == ' ' && next_char == ' ' {
-					processed_line = append(processed_line, char)
-				} else if last_char == ' ' && next_char != ' ' {
-					processed_line = append(processed_line, char, ' ')
-				} else if last_char != ' ' && next_char == ' ' {
-					processed_line = append(processed_line, ' ', char)
-				} else {
-					processed_line = append(processed_line, ' ', char, ' ')
+				if last_char != ',' { // esse if consegue evitar duplos espaços entre duas virgulas
+					if last_char == ' ' && next_char == ' ' {
+						processed_line = append(processed_line, char)
+					} else if last_char == ' ' && next_char != ' ' {
+						processed_line = append(processed_line, char, ' ')
+					} else if last_char != ' ' && next_char == ' ' {
+						processed_line = append(processed_line, ' ', char)
+					} else {
+						processed_line = append(processed_line, ' ', char, ' ')
+					}
 				}
-
 			}
 
 		} else {
@@ -181,6 +183,7 @@ func scan_data(raw_data []byte) [][][]byte {
 	for _, line := range lines {
 		//PROCESSA CADA LINHA, REMOVENDO COMENTARIOS, ESPAÇOS, VIRGULAS MAL COLOCADAS, ETC
 		var processed_line []byte = terraform_line(line)
+		fmt.Printf("Processed Line: [%s]\n", string(processed_line))
 		//BREAKS THE LINE INTO words_slice
 		var broken_line [][]byte = word_break_line(processed_line)
 		new_data = append(new_data, broken_line)

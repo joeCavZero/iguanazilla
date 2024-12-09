@@ -1,7 +1,7 @@
 .data
-macaco: .asciiz "tome   ""
+macaco: .asciiz "tome   "
 sagui: .asciiz "hi"#HAPPY
-chipanze: .word 20,30,40,50
+chipanze: .word 20,30,40,50,,,
 bonobo: .word 10, 11
 
 mico: .word 1 , 2, 3 , 4,      5,

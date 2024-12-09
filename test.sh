@@ -1,1 +1,1 @@
-go run main.go ./examples/test.asm
+go run main.go ./examples/test2.asm
