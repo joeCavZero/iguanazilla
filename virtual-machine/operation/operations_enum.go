@@ -1,4 +1,4 @@
-package codop
+package operation
 
 const (
 	// Codops
