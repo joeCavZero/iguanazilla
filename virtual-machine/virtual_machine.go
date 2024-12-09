@@ -3,6 +3,7 @@ package virtualmachine
 import (
 	"bytes"
 	"fmt"
+	"iguanazilla/logkit"
 	"os"
 )
 
@@ -21,6 +22,8 @@ type VirtualMachine struct {
 	memory_pointer uint32
 	symbol_table   SymbolTable
 }
+
+var lk_tokenizer = logkit.NewLogkit("tokenizer")
 
 func NewVirtualMachine(source_file string) *VirtualMachine {
 	return &VirtualMachine{
@@ -54,7 +57,7 @@ func (vm *VirtualMachine) load_memory() {
 	var data [][][]byte = scan_data(raw_data)
 
 	// PRINT
-	fmt.Printf("====== %d linhas ======\n", len(data))
+	fmt.Printf("====== DADOS ESCANEADOS: %d LINHAS ======\n", len(data))
 	for i_line := 0; i_line < len(data); i_line++ {
 		fmt.Printf("Linha %d: ", i_line)
 		for i_word := 0; i_word < len(data[i_line]); i_word++ {
@@ -62,6 +65,9 @@ func (vm *VirtualMachine) load_memory() {
 		}
 		fmt.Println()
 	}
+
+	// TOKENIZA
+
 }
 
 func (vm *VirtualMachine) Run() {
@@ -133,6 +139,9 @@ func terraform_line(line []byte) []byte {
 					} else {
 						processed_line = append(processed_line, ' ', char, ' ')
 					}
+				} else { // insere um comma de gaiato para depois detectar como erro
+					processed_line = append(processed_line, ',', ' ')
+					continue
 				}
 			}
 
@@ -145,7 +154,7 @@ func terraform_line(line []byte) []byte {
 	return processed_line
 }
 
-func word_break_line(line []byte) [][]byte {
+func breakdown_line(line []byte) [][]byte {
 	var is_quote_opened bool = false
 	var words_slice [][]byte
 	var word []byte
@@ -185,7 +194,7 @@ func scan_data(raw_data []byte) [][][]byte {
 		var processed_line []byte = terraform_line(line)
 		fmt.Printf("Processed Line: [%s]\n", string(processed_line))
 		//BREAKS THE LINE INTO words_slice
-		var broken_line [][]byte = word_break_line(processed_line)
+		var broken_line [][]byte = breakdown_line(processed_line)
 		new_data = append(new_data, broken_line)
 	}
 

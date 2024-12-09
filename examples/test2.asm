@@ -1,1 +1,1 @@
-z: .word 20,30,40,50,,,
+z: .word 20,30,40,50," chipanzé"," oi meu   amigo  ",60

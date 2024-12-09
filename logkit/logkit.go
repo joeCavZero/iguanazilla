@@ -2,6 +2,7 @@ package logkit
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -44,7 +45,7 @@ func (lk *Logkit) Error(msg ...string) {
 func (lk *Logkit) LineError(line uint16, msg ...string) {
 	aux := append(
 		[]string{
-			"Line:", fmt.Sprint(line),
+			"line", fmt.Sprint(line), "error:",
 			string(line),
 		},
 		msg...,
@@ -55,10 +56,15 @@ func (lk *Logkit) LineError(line uint16, msg ...string) {
 func (lk *Logkit) LineInfo(line uint16, msg ...string) {
 	aux := append(
 		[]string{
-			"Line:", fmt.Sprint(line),
+			"line", fmt.Sprint(line), "info:",
 			string(line),
 		},
 		msg...,
 	)
 	lk.Info(aux...)
+}
+
+func (lk *Logkit) LineExitError(line uint16, msg ...string) {
+	lk.LineError(line, msg...)
+	os.Exit(1)
 }
